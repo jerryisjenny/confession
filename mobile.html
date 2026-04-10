@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>匿名忏悔室</title>
+    <title>Anonymous confession room</title>
     <style>
         body { padding: 30px; font-family: sans-serif; background: #121212; color: #eee; text-align: center; }
         h2 { margin-bottom: 30px; }
@@ -20,9 +20,9 @@
     </style>
 </head>
 <body>
-    <h2>写下你的忏悔</h2>
-    <textarea id="textInput" placeholder="此地无人知晓你的身份..."></textarea>
-    <button id="sendBtn">发送到展示墙</button>
+    <h2>write down your confession</h2>
+    <textarea id="textInput" placeholder="No one knows who you are..."></textarea>
+    <button id="sendBtn">Send</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -43,7 +43,7 @@
 
         document.getElementById('sendBtn').onclick = function() {
             const text = document.getElementById('textInput').value;
-            if(!text.trim()) return alert("不能发空内容哦");
+            if(!text.trim()) return alert("No empty confessions allowed!");
 
             const listRef = ref(db, 'confessions');
             const newPostRef = push(listRef);
@@ -52,10 +52,10 @@
                 content: text,
                 time: Date.now()
             }).then(() => {
-                alert("已成功送往忏悔墙");
+                alert("Confession sent successfully!");
                 document.getElementById('textInput').value = "";
             }).catch((err) => {
-                alert("发送失败，请检查数据库权限设置！");
+                alert("send failed, please try again.");
                 console.error(err);
             });
         };
