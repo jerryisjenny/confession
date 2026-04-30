@@ -3,29 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anonymous confession room</title>
+    <title>Digital Confession Room</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
     <style>
-        body { padding: 30px; font-family: sans-serif; background: #121212; color: #eee; text-align: center; }
-        h2 { margin-bottom: 30px; }
-        textarea { 
-            width: 100%; height: 200px; font-size: 18px; border-radius: 12px; 
-            padding: 15px; box-sizing: border-box; border: 1px solid #444; 
-            background: #1e1e1e; color: #fff;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        button { 
-            width: 100%; padding: 18px; margin-top: 25px; background: #ff4757; 
-            color: #fff; border: none; border-radius: 12px; font-size: 20px; font-weight: bold;
+
+        #ui {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            width: 100%;
+            transition: opacity 0.8s ease;
+            z-index: 10;
         }
-        button:active { background: #ff6b81; transform: scale(0.98); }
+
+        #ui.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'UnifrakturMaguntia', cursive;
+            font-size: 2.8rem;
+            color: #c03030;
+            line-height: 1.1;
+            text-align: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1.2rem 0 1.6rem;
+            width: min(480px, 90%);
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 0.5px;
+            background: linear-gradient(to right, transparent, #6b0000, transparent);
+        }
+
+        .divider-glyph {
+            color: #6b0000;
+            font-size: 16px;
+            font-family: 'IM Fell English', serif;
+        }
+
+        .subtitle {
+            font-family: 'IM Fell English', serif;
+            font-style: italic;
+            color: #7a2020;
+            font-size: 18px;
+            margin-bottom: 1.8rem;
+            letter-spacing: 0.04em;
+            text-align: center;
+        }
+
+        .confession-box {
+            width: min(480px, 90%);
+            background: #0f0000;
+            border: 0.5px solid #5a0000;
+            border-radius: 2px;
+            padding: 1px;
+            position: relative;
+        }
+
+        .confession-box::before,
+        .confession-box::after {
+            content: '✦';
+            position: absolute;
+            color: #6b0000;
+            font-size: 10px;
+            top: -6px;
+        }
+        .confession-box::before { left: -4px; }
+        .confession-box::after  { right: -4px; }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: #0f0000;
+            border: none;
+            color: #cc5555;
+            font-family: 'IM Fell English', serif;
+            font-size: 15px;
+            line-height: 1.8;
+            padding: 1.2rem 1.4rem;
+            resize: vertical;
+            outline: none;
+            caret-color: #aa2020;
+            letter-spacing: 0.02em;
+            display: block;
+        }
+
+        textarea::placeholder {
+            color: #3a0808;
+            font-style: italic;
+        }
+
+        button {
+            width: min(480px, 90%);
+            margin-top: 1.2rem;
+            padding: 0.9rem;
+            background: transparent;
+            border: 0.5px solid #6b0000;
+            color: #aa3333;
+            font-family: 'IM Fell English', serif;
+            font-size: 15px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: color 0.3s, border-color 0.3s, background 0.3s;
+        }
+
+        button:hover  { background: #1a0000; border-color: #aa2020; color: #cc4444; }
+        button:active { transform: scale(0.99); background: #220000; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .footer-note {
+            margin-top: 2rem;
+            font-family: 'IM Fell English', serif;
+            font-style: italic;
+            color: #7a2020;
+            font-size: 18px;
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
+
+        #toggleBtn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            width: auto;
+            margin: 0;
+            padding: 0.6rem 1.4rem;
+            font-size: 14px;
+            letter-spacing: 0.15em;
+            border-color: #6b0000;
+            color: #aa3333;
+            z-index: 100;
+            opacity: 0.7;
+            transition: opacity 0.3s, color 0.3s, border-color 0.3s, background 0.3s;
+        }
+
+        #toggleBtn:hover {
+            opacity: 1;
+            background: #1a0000;
+            border-color: #aa2020;
+            color: #cc4444;
+        }
+
+        .confession-bubble {
+            position: fixed;
+            font-family: 'IM Fell English', serif;
+            font-style: italic;
+            line-height: 1.6;
+            max-width: 280px;
+            pointer-events: auto;
+            opacity: 0;
+            word-wrap: break-word;
+            z-index: 5;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.8s ease, transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .confession-bubble.visible { opacity: 1; }
+        .confession-bubble.pressed { transform: scale(0.78); }
+
+        .confession-bubble.forgiven {
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.55, 0, 1, 0.45) !important;
+            transform: scale(0) !important;
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: #0f0000;
+            border: 0.5px solid #6b0000;
+            color: #aa3333;
+            font-family: 'IM Fell English', serif;
+            font-style: italic;
+            font-size: 14px;
+            padding: 0.7rem 1.6rem;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.4s, transform 0.4s;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 999;
+        }
+
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
-    <h2>write down your confession</h2>
-    <textarea id="textInput" placeholder="No one knows who you are..."></textarea>
-    <button id="sendBtn">Send</button>
+
+    <div id="ui">
+        <h1>Digital Confession Room</h1>
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span class="divider-glyph">†</span>
+            <div class="divider-line"></div>
+        </div>
+        <p class="subtitle">Confess. Click it five times to release your sin. —<br>Because only you can absolve your own sins.</p >
+        <div class="confession-box">
+            <textarea id="confessionText" placeholder="Whisper what you dare not say aloud..."></textarea>
+        </div>
+        <button id="sendBtn">— Confess —</button>
+        <p class="footer-note">Your words dissolve into the dark. Anonymous. Eternal.</p >
+    </div>
+
+    <button id="toggleBtn">— Hide —</button>
+    <div class="toast" id="toast"></div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -38,27 +252,129 @@
             appId: "1:611628383887:web:09e851f8defc13d72ffafa"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const existing = getApps();
+        const app = existing.length ? existing[0] : initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        document.getElementById('sendBtn').onclick = function() {
-            const text = document.getElementById('textInput').value;
-            if(!text.trim()) return alert("No empty confessions allowed!");
+        function showToast(msg, isError) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.borderColor = isError ? '#aa1111' : '#6b0000';
+            t.style.color = isError ? '#cc4444' : '#aa3333';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3200);
+        }
 
-            const listRef = ref(db, 'confessions');
-            const newPostRef = push(listRef);
-            
-            set(newPostRef, {
-                content: text,
-                time: Date.now()
-            }).then(() => {
-                alert("Confession sent successfully!");
-                document.getElementById('textInput').value = "";
-            }).catch((err) => {
-                alert("send failed, please try again.");
-                console.error(err);
+        const colors = ['#cc3333', '#aa2222', '#dd4444', '#bb2020', '#e05050'];
+        function randomBetween(a, b) { return a + Math.random() * (b - a); }
+
+        function spawnBubble(text) {
+            const el = document.createElement('div');
+            el.className = 'confession-bubble';
+            el.textContent = text;
+            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            el.style.fontSize = randomBetween(13, 18) + 'px';
+            document.body.appendChild(el);
+
+            let clicks = 0;
+            let paused = false;
+            const CLICKS_TO_FORGIVE = 5;
+
+            el.addEventListener('mousedown',  () => { el.classList.add('pressed'); paused = true; });
+            el.addEventListener('touchstart', () => { el.classList.add('pressed'); paused = true; }, { passive: true });
+
+            el.addEventListener('mouseup',  () => { el.classList.remove('pressed'); paused = false; });
+            el.addEventListener('touchend', () => { el.classList.remove('pressed'); paused = false; });
+
+            // in case cursor leaves while held
+            el.addEventListener('mouseleave', () => { el.classList.remove('pressed'); paused = false; });
+
+            el.addEventListener('click', () => {
+                clicks++;
+                el.style.color = '#ff6666';
+                setTimeout(() => {
+                    if (!el.classList.contains('forgiven')) {
+                        el.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    }
+                }, 120);
+
+                if (clicks >= CLICKS_TO_FORGIVE) {
+                    el.classList.remove('pressed');
+                    el.classList.add('forgiven');
+                    paused = false;
+                    setTimeout(() => el.remove(), 700);
+                }
             });
-        };
+
+            requestAnimationFrame(() => {
+                let w = el.offsetWidth;
+                let h = el.offsetHeight;
+                let x = randomBetween(0, window.innerWidth - w);
+                let y = randomBetween(0, window.innerHeight - h);
+                const speed = randomBetween(0.5, 1.2);
+                const angle = Math.random() * 2 * Math.PI;
+                let vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed;
+                let alive = true;
+
+                el.style.left = x + 'px';
+                el.style.top  = y + 'px';
+                requestAnimationFrame(() => el.classList.add('visible'));
+
+                function animate() {
+                    if (!alive || !el.isConnected) return;
+                    if (el.classList.contains('forgiven')) { alive = false; return; }
+                    if (paused) { requestAnimationFrame(animate); return; }
+
+                    x += vx; y += vy;
+                    w = el.offsetWidth; h = el.offsetHeight;
+                    const mX = window.innerWidth  - w;
+                    const mY = window.innerHeight - h;
+                    if (x <= 0)  { x = 0;   vx =  Math.abs(vx); }
+                    if (x >= mX) { x = mX;  vx = -Math.abs(vx); }
+                    if (y <= 0)  { y = 0;   vy =  Math.abs(vy); }
+                    if (y >= mY) { y = mY;  vy = -Math.abs(vy); }
+                    el.style.left = x + 'px';
+                    el.style.top  = y + 'px';
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            });
+        }
+
+        document.getElementById('sendBtn').addEventListener('click', async () => {
+            const text = document.getElementById('confessionText').value;
+            if (!text.trim()) { showToast('A silent confession means nothing.', true); return; }
+
+            const btn = document.getElementById('sendBtn');
+            btn.textContent = '...';
+            btn.disabled = true;
+
+            try {
+                const newRef = push(ref(db, 'confessions'));
+                await set(newRef, { content: text, time: Date.now() });
+                spawnBubble(text);
+                document.getElementById('confessionText').value = '';
+                showToast('Your confession has been received.', false);
+            } catch (err) {
+                showToast('The darkness refused it. Try again.', true);
+                console.error(err);
+            } finally {
+                btn.textContent = '— Confess —';
+                btn.disabled = false;
+            }
+        });
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const ui = document.getElementById('ui');
+        let uiVisible = true;
+
+        toggleBtn.addEventListener('click', () => {
+            uiVisible = !uiVisible;
+            ui.classList.toggle('hidden', !uiVisible);
+            toggleBtn.textContent = uiVisible ? '— Hide —' : '— Open —';
+        });
     </script>
+
 </body>
 </html>
