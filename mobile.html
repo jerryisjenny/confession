@@ -227,7 +227,7 @@
             <span class="divider-glyph">†</span>
             <div class="divider-line"></div>
         </div>
-        <p class="subtitle">Confess. But only you can absolve yourself —<br>click it five times, and let it go.</p >
+        <p class="subtitle">Confess. Then click it once —<br>and let it go.</p >
         <div class="confession-box">
             <textarea id="confessionText" placeholder="Whisper what you dare not say aloud..."></textarea>
         </div>
@@ -273,12 +273,10 @@
             el.className = 'confession-bubble';
             el.textContent = text;
             el.style.color = colors[Math.floor(Math.random() * colors.length)];
-            el.style.fontSize = randomBetween(22,32) + 'px';
+            el.style.fontSize = randomBetween(22, 32) + 'px';
             document.body.appendChild(el);
 
-            let clicks = 0;
             let paused = false;
-            const CLICKS_TO_FORGIVE = 5;
 
             el.addEventListener('mousedown',  () => { el.classList.add('pressed'); paused = true; });
             el.addEventListener('touchstart', () => { el.classList.add('pressed'); paused = true; }, { passive: true });
@@ -287,20 +285,10 @@
             el.addEventListener('mouseleave', () => { el.classList.remove('pressed'); paused = false; });
 
             el.addEventListener('click', () => {
-                clicks++;
-                el.style.color = '#ff6666';
-                setTimeout(() => {
-                    if (!el.classList.contains('forgiven')) {
-                        el.style.color = colors[Math.floor(Math.random() * colors.length)];
-                    }
-                }, 120);
-
-                if (clicks >= CLICKS_TO_FORGIVE) {
-                    el.classList.remove('pressed');
-                    el.classList.add('forgiven');
-                    paused = false;
-                    setTimeout(() => el.remove(), 700);
-                }
+                el.classList.remove('pressed');
+                el.classList.add('forgiven');
+                paused = false;
+                setTimeout(() => el.remove(), 700);
             });
 
             requestAnimationFrame(() => {
@@ -374,4 +362,4 @@
     </script>
 
 </body>
-</html>
+</h
